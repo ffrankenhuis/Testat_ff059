@@ -1,0 +1,123 @@
+---
+title: "Testat Reichsbürger-Razzia"
+subtitle: "Reichsbürger-Netzwerk mit Berufsfeldern und Organisationszugehörigkeiten"
+author: "Florian Frankenhuis"
+date: '16-12-2022'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = FALSE,
+	include = FALSE)
+library(igraph)
+```
+
+# Testat
+
+## Daten und Codebuch
+
+Die Daten und das Codebuch sind in meinem
+[Github-Account](https://github.com/ffrankenhuis/Testat_ff059) hinterlegt. 
+Erhoben wurden die in der Reichsbürger-Razzia
+[Beteiligten](https://taz.de/Razzia-gegen-Reichsbuerger/!5898636/) laut der taz und (https://www.belltower.news/update-reichsbuerger-razzien-das-breite-netzwerk-der-revolutionsbereiten-reichsbuergerinnen-144131/) laut belltower.\
+
+## Netzwerk einlesen
+
+```{r Netzwerk einlesen}
+# Programmbibliothek laden
+library(igraph)
+
+# Einlesen der Edge- und Nodelist
+edges <- read.csv("https://raw.githubusercontent.com/ffrankenhuis/Testat_ff059/main/edgelist.csv", header=T, as.is=T, sep = ",")
+
+nodes <- read.csv("https://raw.githubusercontent.com/ffrankenhuis/Testat_ff059/main/nodelist.csv", header=T, as.is=T, sep = ",")
+
+# Matrix erstellen
+edgematrix <-as.matrix(edges)
+
+# Zusammenführen von Edge- und Nodelist als igraph-Objekt s
+rb <- graph_from_data_frame(d=edgematrix, vertices=nodes, directed=F)
+rb
+```
+
+## Datensatz vorbereiten
+
+```{r Netzwerk analysieren, fig.height=6, fig.width=9}
+
+# Einfacher plot
+plot(rb,
+     asp=0,
+     vertex.size=5,
+     layout=layout_nicely,
+     main="Reichsbürger-Netzwerk")
+
+# Farben für Vertex-Attribut "sector" festlegen
+V(rb)[V(rb)$sector == 1]$color <- "orange"
+V(rb)[V(rb)$sector == 2]$color <- "lightblue"
+V(rb)[V(rb)$sector == 3]$color <- "grey"
+V(rb)[V(rb)$sector == 4]$color <- "red"
+V(rb)[V(rb)$sector == 5]$color <- "pink"
+V(rb)[V(rb)$sector == 6]$color <- "yellow"
+V(rb)[V(rb)$sector == 7]$color <- "darkgreen"
+```
+
+## Two-Mode Netzwerk
+
+
+```{r Two-Mode Netzwerk erstellen}
+
+# Vertex-Attribute anzeigen lassen
+list.vertex.attributes(rb)
+
+# Formen für two-Netzwerk festlegen
+V(rb)[V(rb)$type == 1]$shape <- "circle" # Person
+V(rb)[V(rb)$type == 2]$shape <- "square" # Organisation
+
+```
+
+```{r Netzwerk visualisieren, fig.height=6, fig.width=9}
+
+# Netzwerk nach Menschen/Berufsfeldern und Organisationen visualisieren
+
+
+# Einfacher plot
+plot(rb,
+     asp=0,
+     vertex.size=5,
+     layout=layout_nicely,
+     main="Reichsbürger-Netzwerk",
+      main="Netzwerk zur Reichsbürger-Razzia",
+     sub="Visualisierung nach Menschen/Berufsfeldern und Organisationen
+          orange = Militär, hellblau = Dienstleistung, grau = Recht, rot = Politik, pink = Kultur, gelb = Adel,  grün = Polizei")
+
+plot(rb,
+     asp=0,
+     layout=layout_with_kk,
+     rescale=TRUE,
+     vertex.size=degree(rb)*2,
+
+     edge.color="grey20",
+     edge.arrow.size=.2,
+     main="Netzwerk zur Reichsbürger-Razzia",
+     sub="Visualisierung nach Menschen/Berufsfeldern und Organisationen
+          braun = Militär, hellblau = Dienstleistung, grau = Recht, rot = Politik, pink = Kultur, gelb = Adel,  grün = Polizei")
+```
+
+# Beantwortung der Fragen auf Moodle
+
+1) Wie interpretieren Sie das erstellte Netzwerk? Wieviel Zeit haben Sie dafür benötigt (ohne Fehlerkorrektur sollte das in maximal ein bis drei Stunden machbar sein)?
+
+Da ich mich bei der Datenerhebung vor allem auf die Berufsfelder und Parteizugehörigkeiten konzentriert habe, zeigt das Netzwerk auf, welche gesellschaftliche Gruppen (hier vor allem Militär) und Parteien (hier vor allem AfD) eine zentrale Rolle spielen. Zudem kann analysiert werden, welche Akteure miteinander verbunden sind. An dieser Stelle muss ich anmerken, dass ich mir bei der Datenerhebung sehr schwer getan habe, da grundsätzlich jeder im Netzwerk ja jedem schonmal bekannt sein sollte (siehe Aufgabenstellung). In den Texten wurde für mich die Rolle von einzelnen Akteuren, z.B. Prinz Heinrich oder Frank Heppner, nicht klar genug, sodass ich Schwierigkeiten bei der Einordnung im Netzwerk hatte. 
+Dass manche Akteure keine Verbindung haben oder ein ,,abgetrenntes" Teilnetzwerk darstellen, liegt wie gesagt an der Uneindeutigkeit ihrer Rolle auf Basis der Texte.
+Nichtsdestotrotz wird durch das Netzwerk deutlich, dass neben dem Militär auch Polizei und der Adel eine tragende Rolle innerhalb des Netzwerks haben. Vor allem Michael Fritsch agiert hier als wichtige Vermittler zwischen dem Militär-Netzwerk und weiteren Teilnetzwerken, auch wegen seiner Zugehörigkeit zur Partei ,,Die Basis" ist er wichtiger Knoten im Netzwerk und möglicher Zugangspunkt für Personen aus der Partei.
+Durch die Schwierigkeiten in der Datenerhebung dauerte die Bearbeitung des Testats inklusive aller Schritte ca. 5 Stunden.
+
+2) Was war Ihr grösster Lernerfolg der Veranstaltung?
+
+Mein größter Lernerfolg war, dass mir die Bedeutung von sozialen Netzwerken/Netzwerkstrukturen insgesamt sehr bewusst geworden ist und soziale Netzwerke mit ihren Mechanismen, Eigenschaften und Dynamiken nahezu jede Beziehung unseres täglichen Lebens beeinflussen. Dazu gehört auch, dass ich nun viel öfter an die Verflechtung einzelner Personen in ihrem sozialen Netzwerk denke, wenn ich nun neu auf eine Person stoße.
+
+3) Welches Netzwerk möchten Sie gerne selbst untersuchen?
+
+Ich würde gerne das Netzwerk von verschiedenen Abitur-Jahrgängen meines damaligen Gymnasiums und ihren nachfolgenden Studienplätzen untersuchen. Dort könnte man genauer untersuchen, ob es z.B. fachliche Strömungen (z.B. naturwissenschaftlich/geisteswissenschaftlich) oder geographische Strömungen gibt (z.B. in Bayern bleibend/viele Studierende nach Berlin) und ob sich diese ,,Trends" in mehreren Jahrgängen ähneln.
